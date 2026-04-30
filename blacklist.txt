@@ -1,0 +1,48 @@
+# colony-autofulfill blacklist
+#
+# Items listed here will NEVER be exported to the colony, even when a
+# MineColonies request lists them as an acceptable alternative
+# (e.g. a smelter asking for "any smeltable ore" — without this, your
+# 1.2M ancient debris would happily ship out).
+#
+# This file is reloaded automatically every poll cycle, so edit and
+# save without rebooting the computer.
+#
+# Lines starting with # are comments. Blank lines are ignored.
+#
+# Two formats:
+#   <namespace:item>     — exact item ID (most common)
+#   tag:<tag>            — match by tag, with or without the
+#                          "minecraft:item/" prefix
+#
+# Examples:
+#   minecraft:ancient_debris
+#   tag:c:ores/netherite_scrap
+#   tag:minecraft:item/c:ores
+
+# ---------------------------------------------------------------
+# Netherite chain — protect from "give me any smeltable ore" etc.
+# ---------------------------------------------------------------
+minecraft:ancient_debris
+minecraft:netherite_scrap
+minecraft:netherite_ingot
+minecraft:netherite_block
+minecraft:netherite_pickaxe
+minecraft:netherite_axe
+minecraft:netherite_shovel
+minecraft:netherite_hoe
+minecraft:netherite_sword
+minecraft:netherite_helmet
+minecraft:netherite_chestplate
+minecraft:netherite_leggings
+minecraft:netherite_boots
+
+# ---------------------------------------------------------------
+# Diamond chain — usually not the right fulfillment for "any tool"
+# ---------------------------------------------------------------
+minecraft:diamond
+minecraft:diamond_block
+
+# ---------------------------------------------------------------
+# Add your own below
+# ---------------------------------------------------------------

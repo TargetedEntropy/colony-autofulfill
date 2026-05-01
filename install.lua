@@ -2,10 +2,10 @@
 -- and probe.lua from the repo into the current directory.
 --
 -- Usage on the CC computer:
---   wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/install.lua install.lua
+--   wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/robust-autofulfill/install.lua install.lua
 --   install.lua
 
-local BASE = "https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/"
+local BASE = "https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/robust-autofulfill/"
 local FILES = { "startup.lua", "blacklist.txt", "probe.lua" }
 
 for _, f in ipairs(FILES) do

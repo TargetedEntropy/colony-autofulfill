@@ -27,7 +27,7 @@ Each script runs on its own CC computer.
 ### Auto-fulfill computer (needs ME Bridge + Colony Integrator)
 
 ```
-wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/install.lua install.lua
+wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/robust-autofulfill/install.lua install.lua
 install.lua
 reboot
 ```
@@ -37,16 +37,31 @@ That installs `startup.lua`, `blacklist.txt`, and `probe.lua`.
 ### Requests display computer (needs Colony Integrator + 5x5 monitor)
 
 ```
-wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/requests-display.lua startup.lua
+wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/robust-autofulfill/requests-display.lua startup.lua
 reboot
 ```
 
 ### Buildings display computer (needs Colony Integrator + 5x5 monitor)
 
 ```
-wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/buildings-display.lua startup.lua
+wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/robust-autofulfill/buildings-display.lua startup.lua
 reboot
 ```
+
+
+## Robust auto-fulfill branch notes
+
+The `robust-autofulfill` branch keeps the same basic loop — read MineColonies requests, choose an AE2 alternative, export stocked items, schedule crafts, and display status — but hardens the fulfillment computer against the common ways these peripherals fail:
+
+- tolerant handling for several Advanced Peripherals method/return shapes (`exportItem`, `craftItem`, `isItemCrafting`, etc.)
+- fallback request fingerprints when MineColonies does not expose stable request ids
+- request+item cooldowns instead of a broad global item cooldown by default, so two builders can request the same common item without starving each other
+- throttled missing/error logs so chat and monitors do not drown during an outage
+- safer export/craft count limits
+- smarter alternative choice: tools prefer better tiers, generic materials prefer abundant/low-value stock and avoid spending valuable gear unless you explicitly allow it
+- inline comments in `blacklist.txt` are accepted
+
+Main tuning keys in `startup.lua`: `dedupe_ttl`, `request_item_cooldown`, `item_cooldown`, `max_export_stack`, `max_craft_batch`, and `missing_log_ttl`.
 
 ## Configuration (auto-fulfill)
 

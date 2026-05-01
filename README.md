@@ -1,8 +1,12 @@
 # colony-autofulfill
 
-A ComputerCraft script that auto-fulfills MineColonies requests from an AE2 network. Polls the colony, exports stocked items into a Post Box buffer, schedules autocrafts when patterns exist, and shows a live dashboard on a monitor.
+ComputerCraft scripts for running a MineColonies colony from a wall of monitors. Three independent scripts, one per CC computer:
 
-Targets **Advanced Peripherals** (Colony Integrator + ME Bridge). Tested against the snake_case peripheral types (`colony_integrator` / `me_bridge`) used in current AP versions; older camelCase names are tried as fallback.
+1. **`startup.lua`** — auto-fulfills colony requests from your AE2 network (with a reloadable blacklist).
+2. **`requests-display.lua`** — paginated live view of every open request on a 5x5 monitor.
+3. **`buildings-display.lua`** — list of every building with level, style, and position on a 5x5 monitor.
+
+All three target **Advanced Peripherals** (Colony Integrator + ME Bridge for the fulfillment, Colony Integrator only for the displays). Tested against the snake_case peripheral types (`colony_integrator` / `me_bridge`) used in current AP versions; older camelCase names are tried as fallback.
 
 ## Hardware
 
@@ -16,7 +20,11 @@ Targets **Advanced Peripherals** (Colony Integrator + ME Bridge). Tested against
 
 All peripherals can sit direct-adjacent to the computer (no modems required), or be networked via wired modems if you need to spread them out. The script auto-discovers peripherals by type — no name configuration.
 
-## Install (on the CC computer)
+## Install
+
+Each script runs on its own CC computer.
+
+### Auto-fulfill computer (needs ME Bridge + Colony Integrator)
 
 ```
 wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/install.lua install.lua
@@ -24,9 +32,23 @@ install.lua
 reboot
 ```
 
-That installs `startup.lua`, `blacklist.txt`, and `probe.lua` into the root of the computer. After reboot it runs as a startup task.
+That installs `startup.lua`, `blacklist.txt`, and `probe.lua`.
 
-## Configuration
+### Requests display computer (needs Colony Integrator + 5x5 monitor)
+
+```
+wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/requests-display.lua startup.lua
+reboot
+```
+
+### Buildings display computer (needs Colony Integrator + 5x5 monitor)
+
+```
+wget https://raw.githubusercontent.com/TargetedEntropy/colony-autofulfill/main/buildings-display.lua startup.lua
+reboot
+```
+
+## Configuration (auto-fulfill)
 
 Open `startup.lua`, scroll to the `CONFIG` table at the top:
 
@@ -88,6 +110,48 @@ This is the lever that controls duplicate shipments. After exporting `minecraft:
 - **Too high**: when the colony genuinely needs more, it waits longer than necessary.
 
 Default 120s works for most setups. If your buffer chest still piles up, raise to 180–240. If your colony seems starved waiting for refills, lower to 90.
+
+## Displays
+
+### Requests display
+
+Polls `colony.getRequests()` every 5 seconds. Renders a paginated table:
+
+```
+== ColonyName — Open Requests ==
+Total: 23   Updated: 12:31:08
+
+TARGET                  ITEM                              CNT   STATE
+Builder Duran W. Good.  1 Stone Bricks                    1     IN_PROGRESS
+Waiter Zain M. Goseb.   Fuel                              128   IN_PROGRESS
+Farmer Reyansh B. Cou.  1-64 Durum Wheat                  64    IN_PROGRESS
+...
+
+Page 1 / 2
+```
+
+State is color-coded: orange = `REQUESTED`, yellow = `IN_PROGRESS`, lime = `IN_DELIVERY`, red = `FAILED`. Pages auto-rotate every 8 seconds.
+
+### Buildings display
+
+Polls `colony.getBuildings()` every 30 seconds:
+
+```
+== ColonyName — Buildings ==
+Total: 23   Updated: 12:31:08
+
+BUILDING            LEVEL    STYLE        POS
+Town Hall           5 / 5    frontier     (123, 64, -45)
+Builder             3 / 5    frontier     (130, 64, -42)
+Builder             2 / 5    frontier     (135, 64, -42)
+Tavern              4 / 5    frontier     (140, 64, -45)
+University          3 / 5    frontier     (115, 64, -55)
+...
+```
+
+Level is color-coded: maxed = lime, ≥60% = green, ≥30% = yellow, lower = orange.
+
+> **Note:** `getBuildings()` shape isn't documented for AP. The script tries multiple field names (`name`/`type`/`id`, `level`/`currentLevel`, etc.) and falls back gracefully. On its first poll it dumps the first 2 building entries to `buildings-shape.txt` on the computer — if column values come back blank or wrong, paste that file back so the script can be patched.
 
 ## Diagnostics
 

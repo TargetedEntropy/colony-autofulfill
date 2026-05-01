@@ -61,17 +61,47 @@ local function field(t, ...)
   end
 end
 
+local function lastSegment(s)
+  -- "com.minecolonies.building.post"     -> "post"
+  -- "minecolonies:postbox"               -> "postbox"
+  -- "com.minecolonies.building.foo.name" -> "foo" (drop trailing "name"/"label")
+  local segs = {}
+  for seg in tostring(s):gmatch("[^.:]+") do table.insert(segs, seg) end
+  if #segs == 0 then return tostring(s) end
+  local last = segs[#segs]
+  if (last == "name" or last == "label") and segs[#segs - 1] then
+    last = segs[#segs - 1]
+  end
+  return last
+end
+
+local function prettify(s)
+  s = tostring(s):gsub("_", " ")
+  return (s:gsub("(%a)(%w*)", function(a, rest) return a:upper() .. rest end))
+end
+
+-- A translation key contains "." but no ":", e.g. "com.minecolonies.building.post".
+-- A registry name contains ":", e.g. "minecolonies:postbox".
+local function looksLikeTranslationKey(s)
+  s = tostring(s or "")
+  return s:find("%.") ~= nil and not s:find(":")
+end
+
 local function buildingName(b)
-  -- Try most-specific to least-specific. Strip "minecolonies:" prefix
-  -- and capitalize for display.
-  local n = field(b, "name", "type", "id", "schematicName", "building")
-  if not n then return "?" end
-  n = tostring(n)
-  n = n:gsub("^minecolonies:", "")
-  n = n:gsub("_", " ")
-  -- Title-case each word
-  n = n:gsub("(%a)(%w*)", function(a, b) return a:upper() .. b end)
-  return n
+  -- Prefer cleaner candidates first (displayName, type, id) and only fall back
+  -- to the translation-key style "name" if nothing better is exposed.
+  local prefer = { "displayName", "type", "id", "schematicName", "building" }
+  for _, k in ipairs(prefer) do
+    local v = b[k]
+    if v and not looksLikeTranslationKey(v) then
+      return prettify(lastSegment(v))
+    end
+  end
+  -- Second pass — anything, even a translation key (we'll lastSegment it).
+  for _, k in ipairs({ "name", "displayName", "type", "id", "schematicName", "building" }) do
+    if b[k] then return prettify(lastSegment(b[k])) end
+  end
+  return "?"
 end
 
 local function buildingLevel(b)

@@ -17,11 +17,13 @@ for _, f in ipairs(FILES) do
   shell.run("wget", BASE .. f, f)
 end
 
-print("\n========================================")
+print("")
+print("========================================")
 print("Installed:")
 for _, f in ipairs(FILES) do
-  print("  " .. f .. (fs.exists(f) and "" or "  [MISSING — wget failed]"))
+  print("  " .. f .. (fs.exists(f) and "" or "  [MISSING - wget failed]"))
 end
 print("========================================")
-print("Edit blacklist.txt to taste, then `reboot` to start.")
-print("Run `probe.lua` instead of rebooting if you want to dump the API surface first.")
+print("Run `startup setup` to choose ME export side and other options.")
+print("Then edit blacklist.txt to taste and `reboot` to start.")
+print("Run `probe.lua` if you want to dump the AP API surface first.")
